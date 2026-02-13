@@ -18,6 +18,7 @@ import io.vertx.core.buffer.Buffer;
 
 import javax.net.ssl.SSLSession;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * <p>A Quic connection between a client and a server, providing support for handling or creating Quic {@link QuicStream streams}</p>
@@ -175,5 +176,11 @@ public interface QuicConnection {
    * @return the local connection socket address
    */
   SocketAddress localAddress();
+
+  /**
+   * @return the type-length-values present in the TCP header, mainly used for HA Proxy Protocol v2
+   */
+  @GenIgnore()
+  List<TLV> tlvs();
 
 }

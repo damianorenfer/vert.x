@@ -27,11 +27,13 @@ import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.internal.net.NetSocketInternal;
 import io.vertx.core.internal.net.SslHandshakeCompletionHandler;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.core.net.TLV;
 import io.vertx.core.spi.metrics.NetworkMetrics;
 import io.vertx.core.spi.metrics.TransportMetrics;
 
 import javax.net.ssl.SSLSession;
 import java.net.InetSocketAddress;
+import java.util.List;
 
 /**
  * Abstract base class for connections managed by a vertx instance. This base implementation does not handle
@@ -53,6 +55,7 @@ public abstract class ConnectionBase {
   public static final VertxException CLOSED_EXCEPTION = NetSocketInternal.CLOSED_EXCEPTION;
   public static final AttributeKey<SocketAddress> REMOTE_ADDRESS_OVERRIDE = AttributeKey.valueOf("RemoteAddressOverride");
   public static final AttributeKey<SocketAddress> LOCAL_ADDRESS_OVERRIDE = AttributeKey.valueOf("LocalAddressOverride");
+  public static final AttributeKey<List<TLV>> TLVS = AttributeKey.valueOf("TLVS");
   private static final Logger log = LoggerFactory.getLogger(ConnectionBase.class);
 
   protected final VertxInternal vertx;
@@ -424,6 +427,10 @@ public abstract class ConnectionBase {
     } else {
       return localAddress();
     }
+  }
+
+  public List<TLV> tlvs() {
+    return channel.hasAttr(TLVS) ? channel.attr(TLVS).getAndSet(null) : null;
   }
 
 }

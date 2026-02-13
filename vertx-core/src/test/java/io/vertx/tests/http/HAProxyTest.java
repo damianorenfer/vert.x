@@ -15,13 +15,18 @@ import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.core.net.TLV;
 import io.vertx.core.net.impl.HAProxyMessageCompletionHandler;
 import io.vertx.test.http.HttpTestBase;
 import io.vertx.test.proxy.HAProxy;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assume.assumeTrue;
 
 public abstract class HAProxyTest extends HttpTestBase {
@@ -158,6 +163,7 @@ public abstract class HAProxyTest extends HttpTestBase {
             proxy.getConnectionRemoteAddress() :
             local,
           req.localAddress());
+        assertUniqueIdTLV(header, req.connection().tlvs());
         req.response().end();
         complete();
       });
@@ -276,5 +282,20 @@ public abstract class HAProxyTest extends HttpTestBase {
       assertEquals(address1.hostAddress(), address2.hostAddress());
       assertEquals(address1.port(), address2.port());
     }
+  }
+
+  private void assertUniqueIdTLV(Buffer header, List<TLV> tlvs) {
+    // only supported for v2 header and protocol family != unknown
+    if (header.length() < 12 || header.getByte(12) != 0x21 || header.getByte(13) == 0x00) {
+      return;
+    }
+
+    assertThat(tlvs, hasSize(1));
+
+    TLV uniqueIdTLV = tlvs.get(0);
+    assertThat(uniqueIdTLV.type().getByte(0), equalTo((byte)0x05));
+
+    UUID uuid = new UUID(uniqueIdTLV.value().getLong(0), uniqueIdTLV.value().getLong(Long.BYTES));
+    assertThat(uuid, equalTo(UUID.fromString("1f29a3b5-7cc4-4592-a8f1-879ff1f47124")));
   }
 }

@@ -316,5 +316,11 @@ public interface NetSocket extends Socket {
    */
   String applicationLayerProtocol();
 
+  /**
+   * @return the type-length-values present in the TCP header, mainly used for HA Proxy Protocol v2
+   */
+  @GenIgnore()
+  List<TLV> tlvs();
+
 }
 

@@ -26,6 +26,7 @@ import io.vertx.core.internal.PromiseInternal;
 import io.vertx.core.internal.quic.QuicConnectionInternal;
 import io.vertx.core.internal.quic.QuicStreamInternal;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.core.net.TLV;
 
 import javax.net.ssl.SSLSession;
 import java.time.Duration;
@@ -331,5 +332,10 @@ public abstract class Http3Connection implements HttpConnection {
   @Override
   public HttpConnection exceptionHandler(Handler<Throwable> handler) {
     return this;
+  }
+
+  @Override
+  public List<TLV> tlvs() {
+    return connection.tlvs();
   }
 }

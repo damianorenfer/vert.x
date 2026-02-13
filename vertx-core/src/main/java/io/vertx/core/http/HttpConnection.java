@@ -16,6 +16,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.core.net.TLV;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
@@ -297,5 +298,11 @@ public interface HttpConnection {
    * @return the indicated server name
    */
   String indicatedServerName();
+
+  /**
+   * @return the type-length-values present in the TCP header, mainly used for HA Proxy Protocol v2
+   */
+  @GenIgnore()
+  List<TLV> tlvs();
 
 }

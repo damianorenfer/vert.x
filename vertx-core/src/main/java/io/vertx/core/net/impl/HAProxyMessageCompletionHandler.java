@@ -11,9 +11,12 @@ import io.netty.util.concurrent.Promise;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.core.net.TLV;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class HAProxyMessageCompletionHandler extends MessageToMessageDecoder<HAProxyMessage> {
   //Public because its used in tests
@@ -71,6 +74,11 @@ public class HAProxyMessageCompletionHandler extends MessageToMessageDecoder<HAP
           ctx.channel().attr(ConnectionBase.LOCAL_ADDRESS_OVERRIDE)
             .set(createAddress(protocol, msg.destinationAddress(), msg.destinationPort()));
         }
+
+        if (msg.tlvs() != null) {
+          ctx.channel().attr(ConnectionBase.TLVS)
+            .set(createTLVs(msg.tlvs()));
+        }
       }
       ctx.pipeline().remove(this);
       promise.setSuccess(ctx.channel());
@@ -102,5 +110,12 @@ public class HAProxyMessageCompletionHandler extends MessageToMessageDecoder<HAP
       default:
         throw new IllegalStateException("Should never happen");
     }
+  }
+
+  private List<TLV> createTLVs(List<io.netty.handler.codec.haproxy.HAProxyTLV> haProxyTLVs) {
+    return haProxyTLVs.stream()
+      .filter(Objects::nonNull)
+      .map(HAProxyTLV::from)
+      .collect(Collectors.toList());
   }
 }

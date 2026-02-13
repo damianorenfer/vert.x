@@ -21,11 +21,13 @@ import io.vertx.core.internal.ContextInternal;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SSLOptions;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.core.net.TLV;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.core.streams.WriteStream;
 
 import javax.net.ssl.SSLSession;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
@@ -227,6 +229,11 @@ public class HttpNetSocket implements NetSocket {
   @Override
   public SocketAddress localAddress(boolean real) {
     return stream.connection().localAddress(real);
+  }
+
+  @Override
+  public List<TLV> tlvs() {
+    return stream.connection().tlvs();
   }
 
   @Override
